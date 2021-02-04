@@ -1,7 +1,13 @@
-from flask import Flask, request, make_response, redirect, abort
+from flask import Flask, request, make_response, redirect, abort, render_template
 from flask_script import Manager
+from flask_bootstrap import Bootstrap
+from datetime import datetime
+from flask_moment import Moment
+
 app = Flask(__name__)
 manager = Manager(app)
+bootstrap = Bootstrap(app)
+moment = Moment(app)
 
 '''
 #Пример 1
@@ -43,7 +49,7 @@ def index():
 @app.route('/')
 def index():
     return redirect('http://www.example.com')
-'''
+
 #Пример 8
 class User():
     def __init__(self, i, n=''):
@@ -67,13 +73,59 @@ def get_user(id):
         abort(404)
     return '<h1>Hello, %s</h1>' % user.name
 
-"""
-@app.route('/user/<id>')
-def get_user(id):
-    user = load_user(id)
-    return '<h1>Hello %s!</h1>' % user.name
-"""
+#Пример 9
+@app.route('/index')
+def index():
+    return render_template('index.html')
+
+@app.route('/user/<name>')
+def user(name):
+    return render_template('user.html', name=name)
+
+#Пример 10
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/user/<name>')
+def user(name):
+    return render_template('user.html', name=name)
+
+#Пример 11
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
+@app.route('/')
+def index():
+    return render_template('index.html')
+
+@app.route('/user/<name>')
+def user(name):
+    return render_template('user.html', name=name)
+'''
+#Пример 12
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    return render_template('500.html'), 500
+
+@app.route('/')
+def index():
+    return render_template('index.html',
+                           current_time=datetime.utcnow())
+
+@app.route('/user/<name>')
+def user(name):
+    return render_template('user.html', name=name)
 
 if __name__ == '__main__':
-    #app.run(debug=True)
-    manager.run()
+    app.run(debug=True)
+    #manager.run()
